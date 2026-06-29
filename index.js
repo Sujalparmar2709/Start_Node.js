@@ -1,27 +1,23 @@
 const express = require("express");
+const {connectMongoDb} =  require("./connection");
+
+const { logReqRes } = require("./middlewares");
+
 const userRouter = require("./routes/user");
 
-const {connectMongoDb} =  require("./connection");
 const app = express();
-const fs = require("fs");
 const PORT = 8000;
 
 //connection
-connectMongoDb("mongodb://127.0.0.1:27017/sujal")''
+connectMongoDb("mongodb://127.0.0.1:27017/sujal").then(() =>
+    console.log("MongoDB Connected")
+);
 
 app.use(express.urlencoded({extended: false}));
+app.use(logReqRes('log.txt'));
 
 
-app.use((req, res) =>{
-  fs.appendFile(
-    "log.txt",
-    `\n${Date.now()}: ${req.ip} ${req.method}: ${req.path}\n`,
-    (err, date) =>{
-    next();
-    }
-  );
-})
-app.use("/user", userRouter);
+app.use("/api/users", userRouter);
 
 app.listen(PORT, () => console.log(`Server is running on PORT :${PORT}`));
 
